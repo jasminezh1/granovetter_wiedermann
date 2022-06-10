@@ -2,24 +2,8 @@
 import numpy as np
 import networkx as nx
 
-
 def threshold_distribution(r):
     print("oh boy")
-
-print("testing file")
-
-# okay what things go in this model
-# needs some constants, some equations
-# this is all a NETWORK. use networkx, just a network of nodes.
-
-# fix the threshold fraction for now
-
-# let A be the number of certainly acting nodes. hardcode this in for now (or make it command line arg)
-# let P be th enumber of potentially acting nodes.
-# create graph. assign A certainly acting nodes, assign P-A conditionally acting nodes. assign N-P inactive nodes.
-#
-# iterate through all pairs of nodes, adding an edge with probability l. directed vs undirected?
-
 
 # for now, just hardcode in every single value. figure out the equations later.
 # add methods and modularize later
@@ -39,7 +23,7 @@ people.add_nodes_from(iNodes, activity = 'i')
 #print(people.number_of_nodes())
 #print(list(people.nodes.data("a")))
 
-l = 0.2 # edge linking strength forget what it's called
+l = 0.2 # linking probability
 rho = 0.5  # common threshold fraction
 
 all = [*aNodes, *cNodes, *iNodes]
@@ -90,9 +74,11 @@ while newly_active > 0:
             newly_active+=1
             print("woo hoo")
             cNodes.remove(currentNode)
-            
+            aNodes.append(currentNode)
+
     if(newly_active > 0):
         for i in updateNodes:
             people.nodes[i]['activity'] = 'a'
+        print("current num active nodes: ", len(aNodes))
 
-print("end")
+print("Final number of active nodes: ", len(aNodes))

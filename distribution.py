@@ -15,7 +15,7 @@ def f(r):
     #print("this is r: ",r)
     total_summation = [0]
     #print("should be 10 zeros sometimes: ", total_summation)
-    for b in range(0, 30):
+    for b in range(0, 40):
         inner_max = rho * b / (1 - rho)
         inner_max = int(inner_max)
         inner_sum = 0

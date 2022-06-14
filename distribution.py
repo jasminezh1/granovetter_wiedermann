@@ -12,10 +12,7 @@ k = 10      # average degree
 def f(r):
     print("beginning of function")
     print("this is r: ",r)
-    size_of_r = 1
-    if(type(r)==list):
-        size_of_r = len(r)
-    total_summation = [0]*size_of_r
+    total_summation = [0]
     print("should be 10 zeros sometimes: ", total_summation)
     for b in range(1, 20):
         inner_max = rho * b / (1 - rho)

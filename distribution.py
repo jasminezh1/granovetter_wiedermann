@@ -15,12 +15,12 @@ def f(r):
     #print("this is r: ",r)
     total_summation = [0]
     #print("should be 10 zeros sometimes: ", total_summation)
-    for b in range(1, 30):
+    for b in range(0, 30):
         inner_max = rho * b / (1 - rho)
         inner_max = int(inner_max)
         inner_sum = 0
 
-        for a in range(1, inner_max):
+        for a in range(0, inner_max):
             inner_sum += ((k*r)**a)/math.factorial(a)
        
         outer_sum = ((k-k*r)**b)/math.factorial(b)

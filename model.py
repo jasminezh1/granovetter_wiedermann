@@ -1,4 +1,5 @@
 # attempt at implementing Wiedermann's modified Granovetter model
+import sys
 import numpy as np
 import networkx as nx
 
@@ -9,11 +10,13 @@ def threshold_distribution(r):
 # add methods and modularize later
 
 people = nx.Graph() # undirected graph for now, can easily change
-# vars = sys.arv[1:]
-a = 2   # active
-c = 5   # conditionally active
-i = 2   # inactive
+
+vars = sys.argv[1:]
+a = int(vars[0])   # active
+c = int(vars[1])   # conditionally active
+i = int(vars[2])   # inactive
 n = a+c+i
+print("n", n)
 aNodes = list(range(1, a+1))
 cNodes = list(range(a+1, a+c+1))
 iNodes = list(range(a+c+1, n+1))
@@ -24,7 +27,7 @@ people.add_nodes_from(iNodes, activity = 'i')
 #print(list(people.nodes.data("a")))
 
 l = 0.2 # linking probability
-rho = 0.5  # common threshold fraction
+rho = 0.3  # common threshold fraction
 
 all = [*aNodes, *cNodes, *iNodes]
 for node1 in all:
@@ -49,7 +52,6 @@ print("average degree ", k)
 
 newly_active = 1
 while newly_active > 0:
-    print("in while loop")
     newly_active = 0
     updateNodes = []    # nodes to update to active at the end
 
@@ -59,10 +61,9 @@ while newly_active > 0:
         
         for neighbor in people.neighbors(currentNode):
             numNeighbors+=1
-            print(neighbor)
             if(people.nodes[neighbor].get('activity') == 'a'):
                 numActive += 1
-                print("num active", numActive)
+                # print("num active", numActive)
         
         if(numNeighbors == 0):
             cNodes.remove(currentNode) # no point in checking again
@@ -72,13 +73,14 @@ while newly_active > 0:
         if(fraction > rho):
             updateNodes.append(currentNode)
             newly_active+=1
-            print("woo hoo")
+            # print("woo hoo")
             cNodes.remove(currentNode)
             aNodes.append(currentNode)
 
     if(newly_active > 0):
         for i in updateNodes:
             people.nodes[i]['activity'] = 'a'
-        print("current num active nodes: ", len(aNodes))
+        #print("current num active nodes: ", len(aNodes))
 
-print("Final number of active nodes: ", len(aNodes))
+active_nodes = len(aNodes)
+print("Final number of active nodes: ", active_nodes)

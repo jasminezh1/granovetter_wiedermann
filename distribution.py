@@ -9,13 +9,11 @@ k = 10      # average degree
 
 # solve F(r) = (r-a)/c
 
+# distribution threshold
 # r is overall share of active nodes
 def f(r):
-    #print("beginning of function")
-    #print("this is r: ",r)
     total_summation = [0]
-    #print("should be 10 zeros sometimes: ", total_summation)
-    for b in range(0, 40):
+    for b in range(0, 4*k):
         inner_max = rho * b / (1 - rho)
         inner_max = int(inner_max)
         inner_sum = 0
@@ -28,49 +26,59 @@ def f(r):
         total_summation += temp
     return 1 - (math.exp(-k) * total_summation)
 
-def line(r):
-    a = 0.12
-    c = 0.8
+#line from (A,0) to (P,1)
+def line(r, a, c):
+    # a = 0.12
+    # c = 0.8
     return (r-a)/c
 
+# find where f() and line() intersect
+# always in range [0,1]
+def find_intersection(number, a, c):
+    x = np.linspace(0,1,number)
+    a = [a] * number
+    c = [c] * number
+    #print("this is a ", a)
 
-# print("idk: ", f(0.1)) # this is fine
+    distribution = list(map(f,x))
+    dis_array = np.concatenate(distribution, axis=0)
 
-x = np.linspace(0,1,6000)
-#print(x)
-#test = f(x)
-ugh = list(map(f,x))
-ugh_array = np.concatenate(ugh, axis=0)
-#print("f(x) dimension", test.shape)
-# print(ugh_array)
-plt.plot(x,ugh, color = 'red')
+    line_ap = list(map(line, x, a, c))
 
-ugh2 = list(map(line, x))
-plt.plot(x, ugh2, color = 'blue')
+    close_enough = []
+    counter_indices = []
 
-# maybe = np.intersect1d(ugh_array, ugh2)   #nvm it's not precise enough
-#print("maybe ", maybe)
+    # check if values in the two lines are sufficiently close 
+    counter = 0
+    for i in x:
+        subtract = dis_array[counter] - line_ap[counter]
+        if np.abs(subtract) <0.00012 :
+            close_enough.append(i)
+            counter_indices.append(counter)
+        counter+=1
 
-close_enough = []
-counter_indices = []
+    rounded = [round(elem, 3) for elem in close_enough]     # rounded to 2 places. ok???
+    no_dups =  np.unique(rounded).tolist()
+    print("x values, rounded: ", no_dups)
 
-counter = 0
-for i in x:
-    subtract = ugh_array[counter] - ugh2[counter]
-    if np.abs(subtract) <0.00012 :
-         close_enough.append(i)
-         counter_indices.append(counter)
-    counter+=1
+    return no_dups, x, distribution, line_ap, dis_array, counter_indices
 
-#print("**********", close_enough)
+# plot f() and line() and their intersection points
+def plot_intersection(x, distribution, line_ap, dis_array, counter_indices):
+    plt.plot(x,distribution, color = 'red')
+    plt.plot(x, line_ap, color = 'blue')
 
-rounded = [round(elem, 2) for elem in close_enough]
-#print("rounded", rounded)
-no_dups =  np.unique(rounded).tolist()
-print("x values, rounded: ", no_dups)
-for i in counter_indices:
-    plt.plot(x[i],ugh_array[i], 'go')
+    for i in counter_indices:
+        plt.plot(x[i],dis_array[i], 'go')
 
-plt.title("F(t)")
-plt.show()
+    plt.title("F(t)")
+    plt.xlabel('R(t)')
+    plt.ylabel('R(t+1) = A + CF(R(t))')
+    plt.show()
+
+
+
+
+fixed_points, x, distribution, line_ap, dis_array, counter_indices = find_intersection(5000, 0.12, 0.8)
+plot_intersection(x, distribution, line_ap, dis_array, counter_indices)
 print("end program")

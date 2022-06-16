@@ -76,10 +76,26 @@ def plot_intersection(x, distribution, line_ap, dis_array, counter_indices):
     plt.ylabel('R(t+1) = A + CF(R(t))')
     plt.show()
 
+def plot_functions(root_x, root_y):
+    intervals = 5000
+    x = np.linspace(0,1,intervals)
+    a = [a] * intervals
+    c = [c] * intervals
 
-def find_intersection_2(x):
-    #print("hello")
-    return [x[1] - f(x[0]), x[1] - line(x[0], 0.4, 0.8)]
+    distribution = list(map(f,x))
+    dis_array = np.concatenate(distribution, axis=0)
+    line_ap = list(map(line, x, a, c))
+    
+    plt.plot(x, distribution, color = 'red')
+    plt.plot(x, line_ap, color = 'blue')
+
+    for i in range[0, len(root_x) - 1]:
+        plt.plot(root_x[i],root_y[i], 'go')
+
+    plt.title("F(t)")
+    plt.xlabel('R(t)')
+    plt.ylabel('R(t+1) = A + CF(R(t))')
+    plt.show()
 
 
 # i think this one is fine
@@ -91,17 +107,12 @@ def find_intersection_3(x):
 fixed_points, x, distribution, line_ap, dis_array, counter_indices = find_intersection(5000, 0.3, 0.8)
 #plot_intersection(x, distribution, line_ap, dis_array, counter_indices)
 
-x0 = [0.5, 0.5]
-root = fsolve(find_intersection_2, x0)
-print("root: ", root)
-
-
-root2 = fsolve(find_intersection_3, [0, 0.5, 1])
+root_x = fsolve(find_intersection_3, [0, 0.5, 1])
+root_y = [line(x) for x in root_x]
 
 #sol = optimize.root(find_intersection_2, x0)
-print("root 2: ", root2)
+print("root 2: ", root_x)
 
-#test = optimize.brentq(find_intersection_3, 0, 1)
-#print("root 3: ", test)
+plot_functions(root_x, root_y)
 
 print("end program")

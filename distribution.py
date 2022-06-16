@@ -2,6 +2,8 @@ from binascii import a2b_hex
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+from scipy import optimize
+from scipy.optimize import fsolve
 
 # attempt to implement the threshold distribution
 # keep these constant for now
@@ -75,8 +77,31 @@ def plot_intersection(x, distribution, line_ap, dis_array, counter_indices):
     plt.show()
 
 
+def find_intersection_2(x):
+    #print("hello")
+    return [x[1] - f(x[0]), x[1] - line(x[0], 0.4, 0.8)]
+
+
+# i think this one is fine
+def find_intersection_3(x):
+    return f(x) - line(x, 0.5, 0.3)
+
 
 # a = .125, c = 0.8
-fixed_points, x, distribution, line_ap, dis_array, counter_indices = find_intersection(5000, 0.19, 0.8)
-plot_intersection(x, distribution, line_ap, dis_array, counter_indices)
+fixed_points, x, distribution, line_ap, dis_array, counter_indices = find_intersection(5000, 0.3, 0.8)
+#plot_intersection(x, distribution, line_ap, dis_array, counter_indices)
+
+x0 = [0.5, 0.5]
+root = fsolve(find_intersection_2, x0)
+print("root: ", root)
+
+
+root2 = fsolve(find_intersection_3, [0, 0.5, 1])
+
+#sol = optimize.root(find_intersection_2, x0)
+print("root 2: ", root2)
+
+#test = optimize.brentq(find_intersection_3, 0, 1)
+#print("root 3: ", test)
+
 print("end program")

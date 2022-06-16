@@ -4,6 +4,7 @@ import math
 import matplotlib.pyplot as plt
 
 # attempt to implement the threshold distribution
+# keep these constant for now
 rho = 0.5       # threshold fraction
 k = 10      # average degree
 
@@ -13,23 +14,21 @@ k = 10      # average degree
 # r is overall share of active nodes
 def f(r):
     total_summation = [0]
-    for b in range(0, 4*k):
-        inner_max = rho * b / (1 - rho)
+    for b in range(0, 2*k):
+        inner_max = rho * b / (1 - rho) #float
         inner_max = int(inner_max)
         inner_sum = 0
 
         for a in range(0, inner_max):
             inner_sum += ((k*r)**a)/math.factorial(a)
        
-        outer_sum = ((k-k*r)**b)/math.factorial(b)
-        temp = np.multiply(outer_sum, inner_sum)
+        outer_term = ((k-k*r)**b)/math.factorial(b)
+        temp = np.multiply(outer_term, inner_sum)
         total_summation += temp
     return 1 - (math.exp(-k) * total_summation)
 
 #line from (A,0) to (P,1)
 def line(r, a, c):
-    # a = 0.12
-    # c = 0.8
     return (r-a)/c
 
 # find where f() and line() intersect
@@ -38,7 +37,6 @@ def find_intersection(number, a, c):
     x = np.linspace(0,1,number)
     a = [a] * number
     c = [c] * number
-    #print("this is a ", a)
 
     distribution = list(map(f,x))
     dis_array = np.concatenate(distribution, axis=0)
@@ -52,12 +50,12 @@ def find_intersection(number, a, c):
     counter = 0
     for i in x:
         subtract = dis_array[counter] - line_ap[counter]
-        if np.abs(subtract) <0.00012 :
+        if np.abs(subtract) <0.0001 :
             close_enough.append(i)
             counter_indices.append(counter)
         counter+=1
 
-    rounded = [round(elem, 3) for elem in close_enough]     # rounded to 2 places. ok???
+    rounded = [round(elem, 3) for elem in close_enough]     # rounded to 3 places. ok???
     no_dups =  np.unique(rounded).tolist()
     print("x values, rounded: ", no_dups)
 
@@ -78,7 +76,7 @@ def plot_intersection(x, distribution, line_ap, dis_array, counter_indices):
 
 
 
-
-fixed_points, x, distribution, line_ap, dis_array, counter_indices = find_intersection(5000, 0.12, 0.8)
+# a = .125, c = 0.8
+fixed_points, x, distribution, line_ap, dis_array, counter_indices = find_intersection(5000, 0.19, 0.8)
 plot_intersection(x, distribution, line_ap, dis_array, counter_indices)
 print("end program")

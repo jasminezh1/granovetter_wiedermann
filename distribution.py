@@ -1,4 +1,5 @@
 from binascii import a2b_hex
+import sys
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -33,63 +34,25 @@ def f(r):
 def line(r, a, c):
     return (r-a)/c
 
-# find where f() and line() intersect
-# always in range [0,1]
-def find_intersection(number, a, c):
-    x = np.linspace(0,1,number)
-    a = [a] * number
-    c = [c] * number
+# find fixed points
+def find_intersection(x, a, c):
+    return f(x) - line(x, a, c)
 
-    distribution = list(map(f,x))
-    dis_array = np.concatenate(distribution, axis=0)
-
-    line_ap = list(map(line, x, a, c))
-
-    close_enough = []
-    counter_indices = []
-
-    # check if values in the two lines are sufficiently close 
-    counter = 0
-    for i in x:
-        subtract = dis_array[counter] - line_ap[counter]
-        if np.abs(subtract) <0.0001 :
-            close_enough.append(i)
-            counter_indices.append(counter)
-        counter+=1
-
-    rounded = [round(elem, 3) for elem in close_enough]     # rounded to 3 places. ok???
-    no_dups =  np.unique(rounded).tolist()
-    print("x values, rounded: ", no_dups)
-
-    return no_dups, x, distribution, line_ap, dis_array, counter_indices
-
-# plot f() and line() and their intersection points
-def plot_intersection(x, distribution, line_ap, dis_array, counter_indices):
-    plt.plot(x,distribution, color = 'red')
-    plt.plot(x, line_ap, color = 'blue')
-
-    for i in counter_indices:
-        plt.plot(x[i],dis_array[i], 'go')
-
-    plt.title("F(t)")
-    plt.xlabel('R(t)')
-    plt.ylabel('R(t+1) = A + CF(R(t))')
-    plt.show()
-
-def plot_functions(root_x, root_y):
+def plot_functions(root_x, root_y, a, c):
     intervals = 5000
     x = np.linspace(0,1,intervals)
     a = [a] * intervals
     c = [c] * intervals
 
     distribution = list(map(f,x))
-    dis_array = np.concatenate(distribution, axis=0)
     line_ap = list(map(line, x, a, c))
+    #difference = list(map(find_intersection, x, a, c))
     
     plt.plot(x, distribution, color = 'red')
     plt.plot(x, line_ap, color = 'blue')
+    #plt.plot(x, difference, color = 'black')
 
-    for i in range[0, len(root_x) - 1]:
+    for i in range(3):
         plt.plot(root_x[i],root_y[i], 'go')
 
     plt.title("F(t)")
@@ -98,21 +61,17 @@ def plot_functions(root_x, root_y):
     plt.show()
 
 
-# i think this one is fine
-def find_intersection_3(x):
-    return f(x) - line(x, 0.5, 0.3)
+vars = sys.argv[1:]
+a, c = float(vars[0]), float(vars[1])   # active, conditionally active
 
 
-# a = .125, c = 0.8
-fixed_points, x, distribution, line_ap, dis_array, counter_indices = find_intersection(5000, 0.3, 0.8)
-#plot_intersection(x, distribution, line_ap, dis_array, counter_indices)
+# hm. Issues. with when there's only one fixed point. 
+root_x = fsolve(find_intersection, [0, 0.5, 1], args = (a, c))
+#root_x =  np.unique(root_x).tolist()
+root_y = [line(x, a, c) for x in root_x]
 
-root_x = fsolve(find_intersection_3, [0, 0.5, 1])
-root_y = [line(x) for x in root_x]
+print("roots: ", root_x)
 
-#sol = optimize.root(find_intersection_2, x0)
-print("root 2: ", root_x)
-
-plot_functions(root_x, root_y)
+plot_functions(root_x, root_y, a, c)
 
 print("end program")

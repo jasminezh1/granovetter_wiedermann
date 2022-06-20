@@ -5,6 +5,7 @@ import math
 import matplotlib.pyplot as plt
 from scipy import optimize
 from scipy.optimize import fsolve
+import warnings
 
 # attempt to implement the threshold distribution
 # keep these constant for now
@@ -52,7 +53,7 @@ def plot_functions(root_x, root_y, a, c):
     plt.plot(x, line_ap, color = 'blue')
     #plt.plot(x, difference, color = 'black')
 
-    for i in range(3):
+    for i in range(0, len(root_x)):
         plt.plot(root_x[i],root_y[i], 'go')
 
     plt.title("F(t)")
@@ -60,17 +61,37 @@ def plot_functions(root_x, root_y, a, c):
     plt.ylabel('R(t+1) = A + CF(R(t))')
     plt.show()
 
+def solve_root(start_guess, a, c):
+    # start = [0, 0.5,1] ; some array with either 1 or 3 guesses
+    root_x = fsolve(find_intersection, start_guess, args = (a, c))
+    return root_x
+
 
 vars = sys.argv[1:]
 a, c = float(vars[0]), float(vars[1])   # active, conditionally active
 
 
+with warnings.catch_warnings():
 # hm. Issues. with when there's only one fixed point. 
-root_x = fsolve(find_intersection, [0, 0.5, 1], args = (a, c))
-#root_x =  np.unique(root_x).tolist()
+    warnings.filterwarnings('error')
+    start_guess = [0, 0.5, 1]
+    try:
+        #warnings.warn(Warning())
+        root_x = solve_root(start_guess, a, c)
+    except RuntimeWarning as e:
+        try:
+            start_guess = [1]
+            root_x = solve_root(start_guess, a, c)
+        except RuntimeWarning as e:
+            start_guess = [0]
+            root_x = solve_root(start_guess, a, c)
+    #root_x =  np.unique(root_x).tolist()
+
+#root_x = np.unique(root_x).tolist()     
+#sometimes duplicates when only 1 root ; fix this later with difference probably
 root_y = [line(x, a, c) for x in root_x]
 
-print("roots: ", root_x)
+print("root(s): ", root_x)
 
 plot_functions(root_x, root_y, a, c)
 

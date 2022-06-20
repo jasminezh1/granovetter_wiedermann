@@ -7,11 +7,6 @@ from scipy import optimize
 from scipy.optimize import fsolve
 import warnings
 
-# attempt to implement the threshold distribution
-# keep these constant for now
-rho = 0.5       # threshold fraction
-k = 10      # average degree
-
 # solve F(r) = (r-a)/c
 
 # distribution threshold
@@ -62,17 +57,19 @@ def plot_functions(root_x, root_y, a, c):
     plt.show()
 
 def solve_root(start_guess, a, c):
-    # start = [0, 0.5,1] ; some array with either 1 or 3 guesses
     root_x = fsolve(find_intersection, start_guess, args = (a, c))
     return root_x
 
+# **********************
+
+rho = 0.5       # threshold fraction
+k = 10      # average degree
 
 vars = sys.argv[1:]
 a, c = float(vars[0]), float(vars[1])   # active, conditionally active
 
-
+# deal with issues if only 1 fixed point
 with warnings.catch_warnings():
-# hm. Issues. with when there's only one fixed point. 
     warnings.filterwarnings('error')
     start_guess = [0, 0.5, 1]
     try:
@@ -85,10 +82,13 @@ with warnings.catch_warnings():
         except RuntimeWarning as e:
             start_guess = [0]
             root_x = solve_root(start_guess, a, c)
-    #root_x =  np.unique(root_x).tolist()
+ 
+# sometimes duplicates when only 1 root
+if (len(root_x)>1):
+    if(np.abs(root_x[0] - root_x[1]) < 0.00001):
+        root_x = [np.mean(root_x)]
 
-#root_x = np.unique(root_x).tolist()     
-#sometimes duplicates when only 1 root ; fix this later with difference probably
+# find correct y values, plot
 root_y = [line(x, a, c) for x in root_x]
 
 print("root(s): ", root_x)

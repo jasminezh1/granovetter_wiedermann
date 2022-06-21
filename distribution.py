@@ -3,7 +3,6 @@ import sys
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-from scipy import optimize
 from scipy.optimize import fsolve
 import warnings
 
@@ -73,18 +72,19 @@ with warnings.catch_warnings():
     warnings.filterwarnings('error')
     start_guess = [0, 0.5, 1]
     try:
-        #warnings.warn(Warning())
         root_x = solve_root(start_guess, a, c)
-    except RuntimeWarning as e:
+    except:
         try:
             start_guess = [1]
             root_x = solve_root(start_guess, a, c)
-        except RuntimeWarning as e:
+        except:
             start_guess = [0]
             root_x = solve_root(start_guess, a, c)
  
 # sometimes duplicates when only 1 root
 if (len(root_x)>1):
+    if(len(root_x) == 2):
+        raise ValueError("not possible to have exactly 2 intersections")
     if(np.abs(root_x[0] - root_x[1]) < 0.00001):
         root_x = [np.mean(root_x)]
 
@@ -95,4 +95,4 @@ print("root(s): ", root_x)
 
 plot_functions(root_x, root_y, a, c)
 
-print("end program")
+#print("end program")
